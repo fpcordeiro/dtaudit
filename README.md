@@ -136,7 +136,7 @@ Standardize variable names and firm names for matching.
 
 ```r
 clean_var_names(c("Sales Revenue", "cost-of-goods"))
-#> [1] "SALES_REVENUE" "COST_OF_GOODS"
+#> [1] "sales_revenue" "cost_of_goods"
 
 clean_firm_name(c("Apple, Inc.", "MICROSOFT CORP."))
 #> [1] "APPLE"     "MICROSOFT"

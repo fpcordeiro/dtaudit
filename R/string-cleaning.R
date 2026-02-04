@@ -28,18 +28,18 @@ extract_initials_charclass <- function(text, max_length = 7) {
 
 #' Clean Variable Names
 #'
-#' Standardizes variable names by trimming whitespace, converting to uppercase
+#' Standardizes variable names by trimming whitespace, converting to lowercase
 #' ASCII, replacing all non-alphanumeric characters with underscores, and
 #' removing leading/trailing underscores.
 #'
 #' @param text Character vector of variable names to clean.
 #'
-#' @return Character vector of cleaned variable names containing only uppercase
+#' @return Character vector of cleaned variable names containing only lowercase
 #'   letters, digits, and underscores.
 #'
 #' @examples
 #' clean_var_names(c("Sales Revenue", "cost-of-goods", " margin "))
-#' # Returns: c("SALES_REVENUE", "COST_OF_GOODS", "MARGIN")
+#' # Returns: c("sales_revenue", "cost_of_goods", "margin")
 #'
 #' @export
 clean_var_names <- function(text) {
@@ -84,8 +84,9 @@ clean_firm_name <- function(text) {
   # Normalize ampersand to AND
   x <- stri_replace_all_regex(x, "\\s*&\\s*", " AND ")
 
-  # Remove apostrophes, punctuation
-  x <- stri_replace_all_regex(x, "[’'`´\\.,;]", "")
+
+  # Remove apostrophes, punctuation (using Unicode escapes for non-ASCII)
+  x <- stri_replace_all_regex(x, "[\u2018\u2019`\u00b4\\.,;]", "")
 
   # Replace remaining symbols to spaces
   x <- stri_replace_all_regex(x, "[^A-Z0-9 ]+", " ")

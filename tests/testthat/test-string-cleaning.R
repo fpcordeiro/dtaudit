@@ -1,26 +1,26 @@
-test_that("clean_var_names converts to uppercase", {
+test_that("clean_var_names converts to lowercase", {
   result <- clean_var_names("sales revenue")
-  expect_equal(result, "SALES_REVENUE")
+  expect_equal(result, "sales_revenue")
 })
 
 test_that("clean_var_names removes non-alphanumerical", {
   result <- clean_var_names("Cost & Other $ Expenses")
-  expect_equal(result, "COST_OTHER_EXPENSES")
+  expect_equal(result, "cost_other_expenses")
 })
 
 test_that("clean_var_names handles dashes", {
   result <- clean_var_names("cost-of-goods")
-  expect_equal(result, "COST_OF_GOODS")
+  expect_equal(result, "cost_of_goods")
 })
 
 test_that("clean_var_names trims whitespace", {
   result <- clean_var_names("  margin  ")
-  expect_equal(result, "MARGIN")
+  expect_equal(result, "margin")
 })
 
 test_that("clean_var_names removes excessive underscores", {
   result <- clean_var_names("sales___revenue")
-  expect_equal(result, "SALES_REVENUE")
+  expect_equal(result, "sales_revenue")
 })
 
 test_that("clean_firm_name removes corporation suffixes", {

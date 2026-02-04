@@ -10,16 +10,16 @@ clean_var_names(text)
 \item{text}{Character vector of variable names to clean.}
 }
 \value{
-Character vector of cleaned variable names containing only uppercase
+Character vector of cleaned variable names containing only lowercase
 letters, digits, and underscores.
 }
 \description{
-Standardizes variable names by trimming whitespace, converting to uppercase
+Standardizes variable names by trimming whitespace, converting to lowercase
 ASCII, replacing all non-alphanumeric characters with underscores, and
 removing leading/trailing underscores.
 }
 \examples{
 clean_var_names(c("Sales Revenue", "cost-of-goods", " margin "))
-# Returns: c("SALES_REVENUE", "COST_OF_GOODS", "MARGIN")
+# Returns: c("sales_revenue", "cost_of_goods", "margin")
 
 }
