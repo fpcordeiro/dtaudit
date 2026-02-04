@@ -2,3 +2,5 @@
 ^\.Rproj\.user$
 ^fernando_lib\.R$
 ^LICENSE\.md$
+^\.claude$
+^CLAUDE\.md$
