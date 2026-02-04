@@ -35,14 +35,20 @@ check_months_coverage <- function(date_var, start_date, end_date) {
 
 #' Summarize a Single Vector
 #'
-#' Internal function to compute summary statistics for a vector. Handles
-#' numeric, character, logical, Date, and other types.
+#' Computes summary statistics for a vector. Handles numeric, character,
+#' logical, Date, and other types with appropriate statistics for each.
 #'
 #' @param x A vector to summarize.
 #'
-#' @return A named character vector with summary statistics.
+#' @returns A named character vector with summary statistics including:
+#'   type, missing count, most frequent value (for non-numeric), mean, sd,
+#'   min, quartiles (q25, q50, q75), max, and three example values.
 #'
-#' @keywords internal
+#' @examples
+#' summarize_data(c(1, 2, 3, NA, 5))
+#' summarize_data(c("a", "b", "a", "c"))
+#'
+#' @export
 summarize_data <- function(x) {
   x_NAs <- is.na(x)
   x_no_NAs <- x[!x_NAs]

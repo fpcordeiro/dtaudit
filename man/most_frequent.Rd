@@ -7,12 +7,18 @@
 most_frequent(x)
 }
 \arguments{
-\item{x}{A vector.}
+\item{x}{A vector (typically character, factor, or integer).}
 }
 \value{
-The most frequent value, or NA if the vector is empty.
+The most frequent value as a character string, or \code{NA} if the
+vector is empty.
 }
 \description{
-Returns the most frequently occurring value in a vector.
+Returns the most frequently occurring value in a vector. Intended for
+categorical or integer variables; issues a warning if used on numeric data.
 }
-\keyword{internal}
+\examples{
+most_frequent(c("a", "b", "a", "c", "a"))
+most_frequent(c(1L, 2L, 2L, 3L))
+
+}

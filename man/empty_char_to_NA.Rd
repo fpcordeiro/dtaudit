@@ -10,10 +10,17 @@ empty_char_to_NA(dt)
 \item{dt}{A data.table.}
 }
 \value{
-The modified data.table (invisibly, modified by reference).
+The modified data.table (invisibly). The original object is
+modified by reference.
 }
 \description{
-Replaces empty strings ("") with NA in all character columns of a data.table.
-Modifies the data.table by reference.
+Replaces empty strings ("") with \code{NA} in all character columns of a
+data.table. Modifies the data.table by reference.
 }
-\keyword{internal}
+\examples{
+library(data.table)
+dt <- data.table(a = c("x", "", "z"), b = c("", "y", ""))
+empty_char_to_NA(dt)
+dt
+
+}

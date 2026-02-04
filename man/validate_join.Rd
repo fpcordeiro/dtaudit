@@ -20,6 +20,7 @@ validate_join(x, y, by = NULL, by.x = NULL, by.y = NULL)
 \value{
 An S3 object of class \code{validate_join} containing:
 \describe{
+\item{x_name, y_name}{Names of the input tables from the original call}
 \item{by.x, by.y}{Key columns used for the join}
 \item{counts}{List with row counts, match rates, and overlap statistics}
 \item{duplicates}{List with duplicate key information for each table}

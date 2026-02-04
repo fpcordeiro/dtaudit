@@ -65,13 +65,19 @@ embed_into_cartesian <- function(dt, group_vars, dt_frame = NULL, fill = NA) {
 
 #' Find Most Frequent Value
 #'
-#' Returns the most frequently occurring value in a vector.
+#' Returns the most frequently occurring value in a vector. Intended for
+#' categorical or integer variables; issues a warning if used on numeric data.
 #'
-#' @param x A vector.
+#' @param x A vector (typically character, factor, or integer).
 #'
-#' @return The most frequent value, or NA if the vector is empty.
+#' @returns The most frequent value as a character string, or `NA` if the
+#'   vector is empty.
 #'
-#' @keywords internal
+#' @examples
+#' most_frequent(c("a", "b", "a", "c", "a"))
+#' most_frequent(c(1L, 2L, 2L, 3L))
+#'
+#' @export
 most_frequent <- function(x) {
   if (is.numeric(x)) warning("x is a numeric vector. This function is primarily for categorical/integer variables")
   tab <- table(x)
@@ -80,14 +86,21 @@ most_frequent <- function(x) {
 
 #' Convert Empty Strings to NA
 #'
-#' Replaces empty strings ("") with NA in all character columns of a data.table.
-#' Modifies the data.table by reference.
+#' Replaces empty strings ("") with `NA` in all character columns of a
+#' data.table. Modifies the data.table by reference.
 #'
 #' @param dt A data.table.
 #'
-#' @return The modified data.table (invisibly, modified by reference).
+#' @returns The modified data.table (invisibly). The original object is
+#'   modified by reference.
 #'
-#' @keywords internal
+#' @examples
+#' library(data.table)
+#' dt <- data.table(a = c("x", "", "z"), b = c("", "y", ""))
+#' empty_char_to_NA(dt)
+#' dt
+#'
+#' @export
 empty_char_to_NA <- function(dt) {
   char_cols <- dt[, names(.SD), .SDcols = is.character]
   dt[, (char_cols) := lapply(.SD, function(x) fifelse(x == "", NA_character_, x)), .SDcols = char_cols]

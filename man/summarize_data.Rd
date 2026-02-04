@@ -10,10 +10,16 @@ summarize_data(x)
 \item{x}{A vector to summarize.}
 }
 \value{
-A named character vector with summary statistics.
+A named character vector with summary statistics including:
+type, missing count, most frequent value (for non-numeric), mean, sd,
+min, quartiles (q25, q50, q75), max, and three example values.
 }
 \description{
-Internal function to compute summary statistics for a vector. Handles
-numeric, character, logical, Date, and other types.
+Computes summary statistics for a vector. Handles numeric, character,
+logical, Date, and other types with appropriate statistics for each.
 }
-\keyword{internal}
+\examples{
+summarize_data(c(1, 2, 3, NA, 5))
+summarize_data(c("a", "b", "a", "c"))
+
+}
