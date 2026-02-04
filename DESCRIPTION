@@ -8,7 +8,7 @@ Description: Tools for auditing data analysis workflows, particularly those
     data.tables, filter with diagnostic output, summarize data quality, clean
     variable and firm names, and export results to Excel. Designed to help
     analysts understand and document data transformations.
-License: GPL-3
+License: LGPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
