@@ -1,5 +1,9 @@
 # dtaudit: `data.table` audit tools
 
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
 Audit and diagnostic tools for data analysis workflows using `data.table`.
 
 ## Overview
@@ -39,7 +43,9 @@ customers <- data.table(
 result <- validate_join(orders, customers, by = "customer_id")
 print(result)
 #> ============== Join Validation Summary ==============
-#> Keys: x[customer_id] <--> y[customer_id]
+#> Tables: orders <--> customers
+#> Keys in orders: customer_id
+#> Keys in customers: customer_id
 #>   Relationship                    : many-to-one
 #>   Key(s) in x   [customer_id]     : (1 col)
 #>   Key(s) in y   [customer_id]     : (1 col)
@@ -53,8 +59,8 @@ print(result)
 #>   Match rate from y               : 66.66667
 #>   Rows only in x (no match in y)  : 2
 #>   Rows only in y (no match in x)  : 1
-#> -----------------------
-#> Duplicates: x=yes  y=no
+#> ------------------------------------
+#> Duplicates: orders=yes  customers=no
 ```
 
 ### Filter with Diagnostics
@@ -70,8 +76,9 @@ sales <- data.table(
 
 # Filter and see what's dropped
 clean_sales <- filter_keep(sales, valid == TRUE, stat = revenue)
-#> Dropped 1 of 4 rows (25.00%).
-#> Dropped 500 of 3,800 for revenue (13.16%).
+#> filter_keep(sales, valid == TRUE)
+#>   Dropped 1 of 4 rows (25.00%).
+#>   Dropped 500 of 3,800 for revenue (13.16%).
 ```
 
 ### Compare Data Tables
