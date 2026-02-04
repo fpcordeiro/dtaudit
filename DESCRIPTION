@@ -1,0 +1,24 @@
+Package: dtaudit
+Title: Audit and Diagnostic Tools for Data Analysis Workflows
+Version: 0.1.0
+Authors@R:
+    person("Fernando", "Meireles", , "fernando.meireles@example.com", role = c("aut", "cre"))
+Description: Tools for auditing data analysis workflows, particularly those
+    using data.table. Provides functions to validate join operations, compare
+    data.tables, filter with diagnostic output, summarize data quality, clean
+    variable and firm names, and export results to Excel. Designed to help
+    analysts understand and document data transformations.
+License: GPL-3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports:
+    data.table,
+    stringi
+Suggests:
+    fixest,
+    modelsummary,
+    openxlsx,
+    pbapply,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
