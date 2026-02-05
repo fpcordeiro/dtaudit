@@ -12,7 +12,7 @@ NULL
 # Suppress R CMD check notes for data.table NSE variables
 utils::globalVariables(c(
 
-  ".", ".N", ".SD", "..by.x", "..key_cols", "..num_cols",
+  ".", ".N", ".SD", "..by.x", "..key_cols", "..num_cols", "..keys", "..vars",
   "N", "N.x", "N.y", "ORIG_CJ__", "ORIG_DT__",
   "part", "statistic", "term", "row_names", "variable"
 ))

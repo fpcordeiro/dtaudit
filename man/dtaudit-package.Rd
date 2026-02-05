@@ -4,12 +4,12 @@
 \name{dtaudit-package}
 \alias{dtaudit}
 \alias{dtaudit-package}
-\title{dtaudit: Audit and Diagnostic Tools for Data Analysis Workflows}
+\title{dtaudit: data.table Audit and Diagnostic Tools}
 \description{
 Tools for auditing data analysis workflows, particularly those using data.table. Provides functions to validate join operations, compare data.tables, filter with diagnostic output, summarize data quality, clean variable and firm names, and export results to Excel. Designed to help analysts understand and document data transformations.
 }
 \author{
-\strong{Maintainer}: Fernando Meireles \email{fernando.meireles@example.com}
+\strong{Maintainer}: Fernando Cordeiro \email{fernandolpcordeiro@gmail.com}
 
 }
 \keyword{internal}
