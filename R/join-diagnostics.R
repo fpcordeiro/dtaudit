@@ -114,18 +114,18 @@ validate_join <- function(x, y, by = NULL, by.x = NULL, by.y = NULL) {
   summary_table <- data.table(
     Item  = c(
       "Relationship",
-      sprintf("Key(s) in x   [%s]", key_lbl_x),
-      sprintf("Key(s) in y   [%s]", key_lbl_y),
-      "Rows in x",
-      "Distinct key combos in x",
-      "Rows in y",
-      "Distinct key combos in y",
+      sprintf("Key(s) in %s   [%s]", x_name, key_lbl_x),
+      sprintf("Key(s) in %s   [%s]", y_name, key_lbl_y),
+      sprintf("Rows in %s", x_name),
+      sprintf("Distinct key combos in %s", x_name),
+      sprintf("Rows in %s", y_name),
+      sprintf("Distinct key combos in %s", y_name),
       "Overlapping distinct key combos",
       "Matched row pairs (cartesian)",
-      "Match rate from x",
-      "Match rate from y",
-      "Rows only in x (no match in y)",
-      "Rows only in y (no match in x)"
+      sprintf("Match rate from %s", x_name),
+      sprintf("Match rate from %s", y_name),
+      sprintf("Rows only in %s (no match in %s)", x_name, y_name),
+      sprintf("Rows only in %s (no match in %s)", y_name, x_name)
     ),
     Value = c(
       merge_type,

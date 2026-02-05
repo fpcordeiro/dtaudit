@@ -84,7 +84,6 @@ clean_firm_name <- function(text) {
   # Normalize ampersand to AND
   x <- stri_replace_all_regex(x, "\\s*&\\s*", " AND ")
 
-
   # Remove apostrophes, punctuation (using Unicode escapes for non-ASCII)
   x <- stri_replace_all_regex(x, "[\u2018\u2019`\u00b4\\.,;]", "")
 
