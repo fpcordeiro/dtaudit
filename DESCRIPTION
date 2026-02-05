@@ -1,8 +1,8 @@
 Package: dtaudit
-Title: Audit and Diagnostic Tools for Data Analysis Workflows
+Title: data.table Audit and Diagnostic Tools
 Version: 0.1.0
 Authors@R:
-    person("Fernando", "Meireles", , "fernando.meireles@example.com", role = c("aut", "cre"))
+    person("Fernando", "Cordeiro", , "fernandolpcordeiro@gmail.com", role = c("aut", "cre"))
 Description: Tools for auditing data analysis workflows, particularly those
     using data.table. Provides functions to validate join operations, compare
     data.tables, filter with diagnostic output, summarize data quality, clean
