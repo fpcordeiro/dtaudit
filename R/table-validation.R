@@ -6,7 +6,7 @@
 #' @param dt A data.table.
 #' @param keys Character vector of column names to test as primary keys.
 #'
-#' @return An S3 object of class `validate_pk` containing:
+#' @returns An S3 object of class `validate_pk` containing:
 #' \describe{
 #'   \item{table_name}{Name of the input table from the original call}
 #'   \item{keys}{Character vector of column names tested}
@@ -102,7 +102,7 @@ validate_primary_keys <- function(dt, keys) {
 #' @param x A `validate_pk` object.
 #' @param ... Additional arguments (ignored).
 #'
-#' @return Invisibly returns the input object.
+#' @returns Invisibly returns the input object.
 #'
 #' @export
 print.validate_pk <- function(x, ...) {
@@ -145,7 +145,7 @@ print.validate_pk <- function(x, ...) {
 #' @param var1 Character string: name of the first variable.
 #' @param var2 Character string: name of the second variable.
 #'
-#' @return An S3 object of class `validate_var_rel` containing:
+#' @returns An S3 object of class `validate_var_rel` containing:
 #' \describe{
 #'   \item{table_name}{Name of the input table from the original call}
 #'   \item{var1, var2}{Names of the variables analyzed}
@@ -283,7 +283,7 @@ validate_var_relationship <- function(dt, var1, var2) {
 #' @param x A `validate_var_rel` object.
 #' @param ... Additional arguments (ignored).
 #'
-#' @return Invisibly returns the input object.
+#' @returns Invisibly returns the input object.
 #'
 #' @export
 print.validate_var_rel <- function(x, ...) {

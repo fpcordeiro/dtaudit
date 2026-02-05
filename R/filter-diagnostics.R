@@ -6,7 +6,7 @@
 #' @param x A data.table or other object.
 #' @param ... Arguments passed to methods.
 #'
-#' @return The filtered data.table.
+#' @returns The filtered data.table.
 #'
 #' @export
 filter_keep <- function(x, ...) UseMethod("filter_keep")
@@ -66,7 +66,7 @@ filter_keep.data.table <- function(x, expr, stat = NULL, na_as = FALSE,
 #' @param x A data.table or other object.
 #' @param ... Arguments passed to methods.
 #'
-#' @return The filtered data.table.
+#' @returns The filtered data.table.
 #'
 #' @export
 filter_drop <- function(x, ...) UseMethod("filter_drop")

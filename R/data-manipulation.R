@@ -12,7 +12,7 @@
 #' @param fill Value to fill for missing combinations. Default is NA.
 #'   Set to NA to leave gaps unfilled.
 #'
-#' @return A data.table with all combinations of group_vars, with original
+#' @returns A data.table with all combinations of group_vars, with original
 #'   data merged in.
 #'
 #' @examples

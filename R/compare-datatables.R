@@ -9,7 +9,7 @@
 #'   rows. If NULL (default), automatically detects character, factor, and
 #'   integer columns as keys.
 #'
-#' @return Invisibly returns a list containing:
+#' @returns Invisibly returns a list containing:
 #' \describe{
 #'   \item{common_columns}{Column names present in both tables}
 #'   \item{only_dt1}{Column names only in dt1}

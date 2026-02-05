@@ -10,7 +10,7 @@
 #' @param na.string Optional string to represent NA values. If NULL (default),
 #'   NA cells are left blank.
 #'
-#' @return Called for side effects (writes file). Returns NULL invisibly.
+#' @returns Called for side effects (writes file). Returns NULL invisibly.
 #'
 #' @note Requires the \pkg{openxlsx} package.
 #'

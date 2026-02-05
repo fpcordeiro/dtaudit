@@ -9,7 +9,7 @@
 #' @param end_date Character or Date. End of the expected date range
 #'   (format: "YYYY-MM-DD").
 #'
-#' @return Called for side effects (prints missing months). Returns NULL
+#' @returns Called for side effects (prints missing months). Returns NULL
 #'   invisibly.
 #'
 #' @examples
@@ -144,7 +144,7 @@ summarize_data <- function(x) {
 #'
 #' @param dt A data.table to summarize.
 #'
-#' @return A data.table with one row per column containing summary statistics.
+#' @returns A data.table with one row per column containing summary statistics.
 #'
 #' @note Requires the \pkg{pbapply} package for progress bars.
 #'

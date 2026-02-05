@@ -9,7 +9,7 @@
 #' @param signif.col Logical. If TRUE, split significance stars into separate
 #'   columns adjacent to coefficients.
 #'
-#' @return A data.table with cleaned regression output.
+#' @returns A data.table with cleaned regression output.
 #'
 #' @note Requires the \pkg{fixest} package.
 #'
@@ -94,7 +94,7 @@ clean_etable <- function(..., etable_args = list(), signif.col = FALSE) {
 #' @param models A list of fixest model objects.
 #' @param models_names Optional character vector of model names (currently unused).
 #'
-#' @return A data.table with formatted regression output.
+#' @returns A data.table with formatted regression output.
 #'
 #' @note Requires the \pkg{modelsummary} and \pkg{fixest} packages.
 #'

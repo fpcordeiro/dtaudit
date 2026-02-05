@@ -10,7 +10,7 @@
 #' @param by.x Character vector of column names in `x` to join on.
 #' @param by.y Character vector of column names in `y` to join on.
 #'
-#' @return An S3 object of class `validate_join` containing:
+#' @returns An S3 object of class `validate_join` containing:
 #' \describe{
 #'   \item{x_name, y_name}{Names of the input tables from the original call}
 #'   \item{by.x, by.y}{Key columns used for the join}
@@ -181,7 +181,7 @@ validate_join <- function(x, y, by = NULL, by.x = NULL, by.y = NULL) {
 #' @param x A `validate_join` object.
 #' @param ... Additional arguments (ignored).
 #'
-#' @return Invisibly returns the input object.
+#' @returns Invisibly returns the input object.
 #'
 #' @export
 print.validate_join <- function(x, ...) {
@@ -215,7 +215,7 @@ print.validate_join <- function(x, ...) {
 #' @param object A `validate_join` object.
 #' @param ... Additional arguments (ignored).
 #'
-#' @return Invisibly returns the summary data.table.
+#' @returns Invisibly returns the summary data.table.
 #'
 #' @export
 summary.validate_join <- function(object, ...) {
