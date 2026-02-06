@@ -16,12 +16,16 @@ check_months_coverage(date_var, start_date, end_date)
 (format: "YYYY-MM-DD").}
 }
 \value{
-Called for side effects (prints missing months). Returns NULL
-invisibly.
+An \link[data.table:IDateTime]{IDate} vector of missing months, returned
+invisibly. Also prints missing months as a side effect.
 }
 \description{
 Verifies whether a date vector contains data for all months within a
 specified date range. Reports any missing months.
+}
+\details{
+This is a convenience wrapper around \code{\link[=check_date_coverage]{check_date_coverage()}} with
+\code{by = "month"}.
 }
 \examples{
 library(data.table)

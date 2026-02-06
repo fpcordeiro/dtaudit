@@ -1,16 +1,80 @@
-#' Check Monthly Date Coverage
+#' Check Date Coverage
 #'
-#' Verifies whether a date vector contains data for all months within a
-#' specified date range. Reports any missing months.
+#' Verifies whether a date vector contains data for all periods within a
+#' specified date range. Reports any missing periods.
 #'
 #' @param date_var A vector of dates to check.
 #' @param start_date Character or Date. Start of the expected date range
 #'   (format: "YYYY-MM-DD").
 #' @param end_date Character or Date. End of the expected date range
 #'   (format: "YYYY-MM-DD").
+#' @param by Character. Period granularity: one of `"day"`, `"week"`,
+#'   `"month"`, `"quarter"`, or `"year"`. Defaults to `"month"`.
 #'
-#' @returns Called for side effects (prints missing months). Returns NULL
-#'   invisibly.
+#' @returns An [IDate][data.table::IDate] vector of missing periods, returned
+#'   invisibly. Also prints missing periods as a side effect.
+#'
+#' @examples
+#' library(data.table)
+#' dates <- as.IDate(c("2023-01-15", "2023-02-20", "2023-04-10"))
+#' check_date_coverage(dates, "2023-01-01", "2023-04-30")
+#' check_date_coverage(dates, "2023-01-01", "2023-04-30", by = "quarter")
+#'
+#' @export
+check_date_coverage <- function(date_var, start_date, end_date, by = "month") {
+  valid_by <- c("day", "week", "month", "quarter", "year")
+  if (!by %in% valid_by) {
+    stop("`by` must be one of: ", paste(valid_by, collapse = ", "))
+  }
+  cat("Checking dates between", as.character(start_date), "and",
+      as.character(end_date), "(by", by, ")\n")
+  all_periods <- seq(as.IDate(start_date), as.IDate(end_date), by = by)
+  trunc_format <- switch(by,
+    day     = "%Y-%m-%d",
+    week    = "%Y-%m-%d",
+    month   = "%Y-%m-01",
+    quarter = NULL,
+    year    = "%Y-01-01"
+  )
+  if (by == "quarter") {
+    actual_dates <- as.Date(date_var)
+    actual_periods <- unique(as.IDate(
+      paste0(format(actual_dates, "%Y-"),
+             sprintf("%02d", (as.integer(format(actual_dates, "%m")) - 1L) %/% 3L * 3L + 1L),
+             "-01")
+    ))
+  } else {
+    actual_periods <- unique(as.IDate(format(date_var, trunc_format)))
+  }
+  missing_periods <- as.IDate(setdiff(all_periods, actual_periods))
+  if (length(missing_periods) == 0L) {
+    cat("All", by, "periods show up in the data!\n")
+  } else {
+    display_format <- switch(by,
+      day     = "%Y-%m-%d",
+      week    = "%Y-%m-%d",
+      month   = "%b-%Y",
+      quarter = "%b-%Y",
+      year    = "%Y"
+    )
+    cat("There are", length(missing_periods), by, "periods missing. These are:\n")
+    cat(paste(format(missing_periods, display_format), collapse = ", "), "\n")
+  }
+  invisible(missing_periods)
+}
+
+#' Check Monthly Date Coverage
+#'
+#' Verifies whether a date vector contains data for all months within a
+#' specified date range. Reports any missing months.
+#'
+#' This is a convenience wrapper around [check_date_coverage()] with
+#' `by = "month"`.
+#'
+#' @inheritParams check_date_coverage
+#'
+#' @returns An [IDate][data.table::IDate] vector of missing months, returned
+#'   invisibly. Also prints missing months as a side effect.
 #'
 #' @examples
 #' library(data.table)
@@ -19,43 +83,42 @@
 #'
 #' @export
 check_months_coverage <- function(date_var, start_date, end_date) {
-  cat("Checking dates between", as.character(start_date), "and", as.character(end_date), "\n")
-  all_months <- seq(as.IDate(start_date), as.IDate(end_date), by = "month")
-  actual_months <- unique(as.IDate(format(date_var, "%Y-%m-01")))
-  missing_months <- as.IDate(setdiff(all_months, actual_months))
-  if (length(missing_months) == 0) {
-    cat("All months show up in the data!\n")
-  } else {
-    cat("There are", length(missing_months), "months missing. These are:\n")
-    missing_formatted <- format(missing_months, "%b-%Y")
-    cat(paste(missing_formatted, collapse = ", "), "\n")
-  }
-  invisible(NULL)
+  check_date_coverage(date_var, start_date, end_date, by = "month")
 }
+
+# Statistic names returned by summarize_vector() — used as row names in
+# get_summary_table(). Defined once so both functions stay in sync.
+.summary_stat_names <- c(
+  "type", "n_unique", "missing", "most_frequent",
+  "mean", "sd", "min", "q25", "q50", "q75", "max",
+  "example1", "example2", "example3"
+)
 
 #' Summarize a Single Vector
 #'
 #' Computes summary statistics for a vector. Handles numeric, character,
-#' logical, Date, and other types with appropriate statistics for each.
+#' factor, logical, Date, and other types with appropriate statistics for each.
 #'
 #' @param x A vector to summarize.
 #'
 #' @returns A named character vector with summary statistics including:
-#'   type, missing count, most frequent value (for non-numeric), mean, sd,
-#'   min, quartiles (q25, q50, q75), max, and three example values.
+#'   type, unique count, missing count, most frequent value (for non-numeric),
+#'   mean, sd, min, quartiles (q25, q50, q75), max, and three example values.
 #'
 #' @examples
-#' summarize_data(c(1, 2, 3, NA, 5))
-#' summarize_data(c("a", "b", "a", "c"))
+#' summarize_vector(c(1, 2, 3, NA, 5))
+#' summarize_vector(c("a", "b", "a", "c"))
 #'
 #' @export
-summarize_data <- function(x) {
+summarize_vector <- function(x) {
   x_NAs <- is.na(x)
   x_no_NAs <- x[!x_NAs]
   n_valid <- length(x_no_NAs)
+  n_uniq <- length(unique(x_no_NAs))
   if (is.numeric(x)) {
     result <- c(
       type = "numeric",
+      n_unique = n_uniq,
       missing = sum(x_NAs),
       most_frequent = NA,
       mean = if (n_valid) mean(x_no_NAs) else NA,
@@ -69,9 +132,28 @@ summarize_data <- function(x) {
       example2 = x_no_NAs[2],
       example3 = x_no_NAs[3]
     )
+  } else if (is.factor(x)) {
+    x_chr <- as.character(x_no_NAs)
+    result <- c(
+      type = "factor",
+      n_unique = n_uniq,
+      missing = sum(x_NAs),
+      most_frequent = most_frequent(x),
+      mean = NA,
+      sd = NA,
+      min = if (n_valid) min(x_chr) else NA,
+      q25 = NA,
+      q50 = NA,
+      q75 = NA,
+      max = if (n_valid) max(x_chr) else NA,
+      example1 = x_no_NAs[1],
+      example2 = x_no_NAs[2],
+      example3 = x_no_NAs[3]
+    )
   } else if (is.character(x)) {
     result <- c(
       type = "character",
+      n_unique = n_uniq,
       missing = sum(x_NAs),
       most_frequent = most_frequent(x),
       mean = NA,
@@ -88,6 +170,7 @@ summarize_data <- function(x) {
   } else if (is.logical(x)) {
     result <- c(
       type = "logical",
+      n_unique = n_uniq,
       missing = sum(x_NAs),
       most_frequent = most_frequent(x),
       mean = mean(x_no_NAs),
@@ -104,6 +187,7 @@ summarize_data <- function(x) {
   } else if ("Date" %in% class(x)) {
     result <- c(
       type = "Date",
+      n_unique = n_uniq,
       missing = sum(x_NAs),
       most_frequent = most_frequent(x),
       mean = NA,
@@ -120,6 +204,7 @@ summarize_data <- function(x) {
   } else {
     result <- c(
       type = class(x)[1],
+      n_unique = n_uniq,
       missing = sum(x_NAs),
       most_frequent = most_frequent(x),
       mean = NA,
@@ -143,10 +228,10 @@ summarize_data <- function(x) {
 #' type, missing values, descriptive statistics, and example values.
 #'
 #' @param dt A data.table to summarize.
+#' @param cols Optional character vector of column names to summarize. If
+#'   `NULL` (the default), all columns are summarized.
 #'
 #' @returns A data.table with one row per column containing summary statistics.
-#'
-#' @note Requires the \pkg{pbapply} package for progress bars.
 #'
 #' @examples
 #' \dontrun{
@@ -157,16 +242,72 @@ summarize_data <- function(x) {
 #'   category = sample(letters[1:5], 100, replace = TRUE)
 #' )
 #' get_summary_table(dt)
+#' get_summary_table(dt, cols = c("value", "category"))
 #' }
 #'
 #' @export
-get_summary_table <- function(dt) {
-  if (!requireNamespace("pbapply", quietly = TRUE)) {
-    stop("Package 'pbapply' is required for get_summary_table(). ",
-         "Please install it with install.packages('pbapply').")
+get_summary_table <- function(dt, cols = NULL) {
+  stopifnot(is.data.table(dt))
+  if (!is.null(cols)) {
+    if (!all(cols %chin% names(dt))) {
+      missing_cols <- setdiff(cols, names(dt))
+      stop(sprintf("Column(s) not found in `dt`: %s",
+                   paste(missing_cols, collapse = ", ")))
+    }
+    dt <- dt[, .SD, .SDcols = cols]
   }
-  # TODO: if pbapply is not available, fall back to lapply without progress bar
-  dt_summary <- dt[, pbapply::pblapply(dt, summarize_data)]
-  dt_summary[, row_names := names(summarize_data(c(1, 1, 1)))]
+  apply_fun <- if (requireNamespace("pbapply", quietly = TRUE)) {
+    pbapply::pblapply
+  } else {
+    lapply
+  }
+  dt_summary <- dt[, apply_fun(dt, summarize_vector)]
+  dt_summary[, row_names := .summary_stat_names]
   transpose(dt_summary, keep.names = "variable", make.names = "row_names")
+}
+
+#' Diagnose Missing Values
+#'
+#' Reports NA counts and percentages for each column in a data.table,
+#' sorted by missing percentage in descending order.
+#'
+#' @param dt A data.table to diagnose.
+#'
+#' @returns A data.table with columns `variable`, `n_na`, `pct_na`, and
+#'   `n_valid`, returned invisibly. Also prints a summary as a side effect.
+#'
+#' @examples
+#' library(data.table)
+#' dt <- data.table(
+#'   a = c(1, NA, 3),
+#'   b = c(NA, NA, "x"),
+#'   c = c(TRUE, FALSE, TRUE)
+#' )
+#' diagnose_nas(dt)
+#'
+#' @export
+diagnose_nas <- function(dt) {
+  stopifnot(is.data.table(dt))
+  n_rows <- nrow(dt)
+  na_counts <- vapply(dt, function(col) sum(is.na(col)), integer(1L))
+  result <- data.table(
+    variable = names(na_counts),
+    n_na     = as.integer(na_counts),
+    pct_na   = round(100 * na_counts / n_rows, 1),
+    n_valid  = as.integer(n_rows - na_counts)
+  )
+  setorderv(result, "pct_na", order = -1L)
+  n_with_na <- sum(result$n_na > 0L)
+  cat(sprintf("%d of %d columns have missing values\n", n_with_na, ncol(dt)))
+  if (n_with_na > 0L) {
+    cols_with_na <- result[n_na > 0L]
+    cat(sprintf("  %-30s %8s %8s\n", "variable", "n_na", "pct_na"))
+    for (i in seq_len(nrow(cols_with_na))) {
+      cat(sprintf("  %-30s %8d %7.1f%%\n",
+                  cols_with_na$variable[i],
+                  cols_with_na$n_na[i],
+                  cols_with_na$pct_na[i]))
+    }
+  }
+  invisible(result)
 }

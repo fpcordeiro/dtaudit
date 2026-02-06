@@ -4,10 +4,13 @@
 \alias{get_summary_table}
 \title{Generate Summary Table for a Data Table}
 \usage{
-get_summary_table(dt)
+get_summary_table(dt, cols = NULL)
 }
 \arguments{
 \item{dt}{A data.table to summarize.}
+
+\item{cols}{Optional character vector of column names to summarize. If
+\code{NULL} (the default), all columns are summarized.}
 }
 \value{
 A data.table with one row per column containing summary statistics.
@@ -15,9 +18,6 @@ A data.table with one row per column containing summary statistics.
 \description{
 Creates a comprehensive summary of all columns in a data.table, including
 type, missing values, descriptive statistics, and example values.
-}
-\note{
-Requires the \pkg{pbapply} package for progress bars.
 }
 \examples{
 \dontrun{
@@ -28,6 +28,7 @@ dt <- data.table(
   category = sample(letters[1:5], 100, replace = TRUE)
 )
 get_summary_table(dt)
+get_summary_table(dt, cols = c("value", "category"))
 }
 
 }
