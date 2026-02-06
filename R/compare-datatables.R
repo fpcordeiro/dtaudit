@@ -30,6 +30,10 @@
 #'
 #' @export
 compare_datatables <- function(dt1, dt2, key_cols = NULL) {
+  # Capture original names from the calling environment
+  name1 <- deparse(substitute(dt1))
+  name2 <- deparse(substitute(dt2))
+
   # Ensure data.table
   if (!is.data.table(dt1)) dt1 <- as.data.table(dt1)
   if (!is.data.table(dt2)) dt2 <- as.data.table(dt2)
@@ -39,9 +43,9 @@ compare_datatables <- function(dt1, dt2, key_cols = NULL) {
   n2 <- nrow(dt2)
 
   cat("1. Number of rows\n")
-  cat("   dt1:", n1, "rows\n")
-  cat("   dt2:", n2, "rows\n")
-  cat("   Difference (dt1 - dt2):", n1 - n2, "\n\n")
+  cat("   ", name1, ": ", n1, " rows\n", sep = "")
+  cat("   ", name2, ": ", n2, " rows\n", sep = "")
+  cat("   Difference (", name1, " - ", name2, "): ", n1 - n2, "\n\n", sep = "")
 
   ## 2. Compare column names --------------------------------------------------
   names1 <- names(dt1)
@@ -53,10 +57,10 @@ compare_datatables <- function(dt1, dt2, key_cols = NULL) {
 
   cat("2. Column names\n")
   cat("   Matching column names :", length(common_cols), "\n")
-  cat("   Only in dt1      :", length(only1),
+  cat("   Only in ", name1, ": ", length(only1),
       if (length(only1)) paste0(" (", paste(only1, collapse = ", "), ")") else "",
       "\n", sep = "")
-  cat("   Only in dt2      :", length(only2),
+  cat("   Only in ", name2, ": ", length(only2),
       if (length(only2)) paste0(" (", paste(only2, collapse = ", "), ")") else "",
       "\n", sep = "")
 
@@ -85,7 +89,7 @@ compare_datatables <- function(dt1, dt2, key_cols = NULL) {
   cat("\n")
 
   if (length(common_cols) == 0L) {
-    stop("No matching column names between dt1 and dt2")
+    stop("No matching column names between ", name1, " and ", name2)
   }
 
   ## 3. Merge on 'keys' (character/factor/integer) ----------------------------
@@ -110,8 +114,8 @@ compare_datatables <- function(dt1, dt2, key_cols = NULL) {
     if (length(missing1) || length(missing2)) {
       stop(
         "Some key_cols not present in both data.tables.\n",
-        "Missing from dt1: ", paste(missing1, collapse = ", "),
-        "\nMissing from dt2: ", paste(missing2, collapse = ", ")
+        "Missing from ", name1, ": ", paste(missing1, collapse = ", "),
+        "\nMissing from ", name2, ": ", paste(missing2, collapse = ", ")
       )
     }
   }
@@ -132,11 +136,11 @@ compare_datatables <- function(dt1, dt2, key_cols = NULL) {
     only_dt1   <- fsetdiff(u1, u2)
     only_dt2   <- fsetdiff(u2, u1)
 
-    cat("   Distinct key combinations in dt1:", nrow(u1), "\n")
-    cat("   Distinct key combinations in dt2:", nrow(u2), "\n")
-    cat("   Matching key combinations      :", nrow(match_keys), "\n")
-    cat("   Only in dt1                    :", nrow(only_dt1), "\n")
-    cat("   Only in dt2                    :", nrow(only_dt2), "\n\n")
+    cat("   Distinct key combinations in ", name1, ": ", nrow(u1), "\n", sep = "")
+    cat("   Distinct key combinations in ", name2, ": ", nrow(u2), "\n", sep = "")
+    cat("   Matching key combinations: ", nrow(match_keys), "\n", sep = "")
+    cat("   Only in ", name1, ": ", nrow(only_dt1), "\n", sep = "")
+    cat("   Only in ", name2, ": ", nrow(only_dt2), "\n\n", sep = "")
 
     key_summary <- list(
       keys       = key_cols,
@@ -164,7 +168,7 @@ compare_datatables <- function(dt1, dt2, key_cols = NULL) {
   } else if (length(key_cols) == 0L) {
     # Fall back to row-wise alignment if we have no keys
     cat("   No key columns; comparing numeric columns by row index ",
-        "(1..min(nrow(dt1), nrow(dt2))).\n", sep = "")
+        "(1..min(nrow(", name1, "), nrow(", name2, "))).\n", sep = "")
 
     maxn <- min(n1, n2)
     idx  <- seq_len(maxn)
