@@ -4,9 +4,17 @@
 \name{dtaudit-package}
 \alias{dtaudit}
 \alias{dtaudit-package}
-\title{dtaudit: data.table Audit and Diagnostic Tools}
+\title{dtaudit: Audit and Diagnostic Tools for 'data.table' Workflows}
 \description{
-Tools for auditing data analysis workflows, particularly those using data.table. Provides functions to validate join operations, compare data.tables, filter with diagnostic output, summarize data quality, clean variable and firm names, and export results to Excel. Designed to help analysts understand and document data transformations.
+Diagnostic tools for auditing data analysis workflows built on 'data.table'. Provides functions to validate join operations, compare data.tables, filter with diagnostic output, summarize data quality, check primary keys and variable relationships, and diagnose string columns. Designed to help analysts understand and document data transformations.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/fpcordeiro/dtaudit}
+  \item Report bugs at \url{https://github.com/fpcordeiro/dtaudit/issues}
+}
+
 }
 \author{
 \strong{Maintainer}: Fernando Cordeiro \email{fernandolpcordeiro@gmail.com}
