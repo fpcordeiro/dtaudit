@@ -143,18 +143,89 @@ test_that("diagnose_nas reports NA counts correctly", {
     b = c(NA, NA, "x"),
     c = c(TRUE, FALSE, TRUE)
   )
-  expect_output(res <- diagnose_nas(dt), "2 of 3 columns have missing values")
-  expect_equal(nrow(res), 3L)
-  expect_equal(res[variable == "b", n_na], 2L)
-  expect_equal(res[variable == "c", n_na], 0L)
+  res <- diagnose_nas(dt)
+  expect_s3_class(res, "diagnose_na")
+  expect_output(print(res), "2 of 3 columns have missing values")
+  expect_equal(nrow(res$table), 3L)
+  expect_equal(res$table[variable == "b", n_na], 2L)
+  expect_equal(res$table[variable == "c", n_na], 0L)
+  expect_equal(res$n_with_na, 2L)
 })
 
 test_that("diagnose_nas handles table with no NAs", {
   dt <- data.table::data.table(a = 1:3, b = letters[1:3])
-  expect_output(res <- diagnose_nas(dt), "0 of 2 columns have missing values")
-  expect_true(all(res$n_na == 0L))
+  res <- diagnose_nas(dt)
+  expect_output(print(res), "0 of 2 columns have missing values")
+  expect_true(all(res$table$n_na == 0L))
+  expect_equal(res$n_with_na, 0L)
 })
 
 test_that("diagnose_nas validates input", {
   expect_error(diagnose_nas(data.frame(a = 1)), "is.data.table")
+})
+
+test_that("diagnose_nas sorts by pct_na descending", {
+  dt <- data.table::data.table(
+    a = c(NA, NA, NA),
+    b = c(1, NA, 3),
+    c = c(1, 2, 3)
+  )
+  res <- diagnose_nas(dt)
+  expect_equal(res$table$variable[1], "a")
+  expect_equal(res$table$variable[3], "c")
+})
+
+test_that("print.diagnose_na returns invisibly", {
+  dt <- data.table::data.table(a = c(1, NA), b = c(NA, NA))
+  res <- diagnose_nas(dt)
+  expect_output(ret <- print(res))
+  expect_s3_class(ret, "diagnose_na")
+})
+
+test_that("get_summary_table returns correct structure", {
+  dt <- data.table::data.table(
+    id = 1:5,
+    value = c(10.0, 20.0, 30.0, 40.0, 50.0),
+    cat = c("a", "b", "a", "c", "b")
+  )
+  result <- get_summary_table(dt)
+
+  expect_s3_class(result, "data.table")
+  expect_equal(nrow(result), 3L)  # one row per column
+  expect_true("variable" %in% names(result))
+  expect_true("type" %in% names(result))
+  expect_true("n_unique" %in% names(result))
+})
+
+test_that("get_summary_table respects cols argument", {
+  dt <- data.table::data.table(a = 1:3, b = 4:6, c = letters[1:3])
+  result <- get_summary_table(dt, cols = c("a", "c"))
+
+  expect_equal(nrow(result), 2L)
+  expect_setequal(result$variable, c("a", "c"))
+})
+
+test_that("check_date_coverage quarterly granularity", {
+  dates <- as.Date(c("2023-01-15", "2023-07-20"))
+  expect_output(
+    res <- check_date_coverage(dates, "2023-01-01", "2023-09-30", by = "quarter"),
+    "1 quarter periods missing"
+  )
+  expect_length(res, 1L)
+})
+
+test_that("check_date_coverage yearly granularity", {
+  dates <- as.Date(c("2020-06-15", "2022-03-20"))
+  expect_output(
+    res <- check_date_coverage(dates, "2020-01-01", "2022-12-31", by = "year"),
+    "1 year periods missing"
+  )
+})
+
+test_that("check_date_coverage quiet parameter suppresses output", {
+  dates <- as.Date(c("2023-01-15", "2023-03-20"))
+  expect_silent(
+    res <- check_date_coverage(dates, "2023-01-01", "2023-03-31", quiet = TRUE)
+  )
+  expect_length(res, 1L)
 })

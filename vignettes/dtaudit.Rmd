@@ -1,0 +1,155 @@
+---
+title: "Introduction to dtaudit"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to dtaudit}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+dtaudit provides diagnostic tools for data analysis workflows built on
+data.table. Unlike assertion-based packages that test whether data meets
+specific rules, dtaudit focuses on **understanding what happens** to your data
+during joins, filters, and transformations --- helping you catch problems before
+they become hard-to-find bugs.
+
+```{r setup}
+library(dtaudit)
+library(data.table)
+```
+
+## Example data
+
+Suppose you have two tables: one with customer orders and another with product
+information. These are typical inputs to a merge operation.
+
+```{r data}
+orders <- data.table(
+  order_id   = 1:8,
+  customer   = c("Alice", "Bob", "Alice", "Carol", "Bob", "Alice", "Dave", "Eve"),
+  product_id = c(101L, 102L, 101L, 103L, 104L, 102L, 105L, 106L),
+  amount     = c(50, 30, 50, 75, 20, 35, 60, 45)
+)
+
+products <- data.table(
+  product_id = c(101L, 102L, 103L, 104L, 107L),
+  category   = c("Electronics", "Books", "Clothing", "Books", "Food"),
+  price      = c(25.0, 15.0, 37.5, 10.0, 8.0)
+)
+```
+
+## Step 1: Validate primary keys
+
+Before merging, check that your join keys actually identify rows uniquely in
+each table.
+
+```{r validate-pk}
+validate_primary_keys(orders, "order_id")
+validate_primary_keys(products, "product_id")
+```
+
+## Step 2: Validate the join
+
+Use `validate_join()` to understand the relationship between the two tables
+**before** merging. This tells you the join type, match rates, and which keys
+are unmatched.
+
+```{r validate-join}
+validate_join(orders, products, by = "product_id")
+```
+
+The output shows a many-to-one relationship (multiple orders per product), with
+some product IDs appearing only in one table. This is expected, but now you
+know exactly what the merge will look like.
+
+## Step 3: Filter with diagnostics
+
+After merging, you may want to filter your data. `filter_keep()` and
+`filter_drop()` work like standard subsetting but report how many rows (and
+optionally how much of a statistic) you're removing.
+
+```{r filter}
+merged <- merge(orders, products, by = "product_id", all.x = TRUE)
+
+# Keep only Electronics and Books, report dropped amount
+result <- filter_keep(merged, category %in% c("Electronics", "Books"), stat = amount)
+```
+
+## Step 4: Compare before and after
+
+`compare_datatables()` gives you a structural comparison between two tables ---
+useful for checking what changed after a transformation.
+
+```{r compare}
+compare_datatables(orders, result)
+```
+
+## Step 5: Check data quality
+
+### Missing values
+
+```{r diagnose-nas}
+# Introduce some NAs to demonstrate
+merged_with_na <- copy(merged)
+merged_with_na[sample(.N, 2), category := NA]
+
+diagnose_nas(merged_with_na)
+```
+
+### String quality
+
+`diagnose_strings()` checks for common string issues: missing values, empty
+strings, whitespace problems, non-ASCII characters, and case inconsistencies.
+
+```{r diagnose-strings}
+diagnose_strings(orders$customer)
+```
+
+### Date coverage
+
+If your data should cover a continuous time range, `check_date_coverage()`
+identifies gaps.
+
+```{r date-coverage}
+dates <- as.IDate(c("2024-01-15", "2024-02-20", "2024-04-10", "2024-05-05"))
+check_date_coverage(dates, "2024-01-01", "2024-06-30")
+```
+
+## Step 6: Summarize columns
+
+`get_summary_table()` produces a one-row-per-column overview of your data,
+including types, missing counts, and descriptive statistics.
+
+```{r summary-table}
+get_summary_table(orders)
+```
+
+## Auditing cleaning operations
+
+When you apply a cleaning function, `audit_clean()` reports exactly what
+changed:
+
+```{r audit-clean}
+firms <- c("Apple Inc.", "MICROSOFT CORP", "Alphabet LLC", "apple", NA)
+audit_clean(firms, clean_firm_name)
+```
+
+## Further reading
+
+See the function reference for complete documentation:
+
+- **Join & key validation**: `validate_join()`, `validate_primary_keys()`,
+  `validate_var_relationship()`
+- **Data comparison**: `compare_datatables()`
+- **Filter diagnostics**: `filter_keep()`, `filter_drop()`
+- **Data quality**: `diagnose_nas()`, `diagnose_strings()`, `audit_clean()`,
+  `get_summary_table()`, `summarize_vector()`, `check_date_coverage()`
+- **String cleaning**: `clean_var_names()`, `clean_firm_name()`
+- **Data manipulation**: `embed_into_cartesian()`
