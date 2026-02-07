@@ -10,9 +10,14 @@
 #'   (format: "YYYY-MM-DD").
 #' @param by Character. Period granularity: one of `"day"`, `"week"`,
 #'   `"month"`, `"quarter"`, or `"year"`. Defaults to `"month"`.
+#' @param quiet Logical. If `TRUE`, suppresses printed output. Defaults to
+#'   `FALSE`.
 #'
 #' @returns An [IDate][data.table::IDate] vector of missing periods, returned
-#'   invisibly. Also prints missing periods as a side effect.
+#'   invisibly.
+#'
+#' @seealso [check_months_coverage()] for a convenience wrapper with
+#'   `by = "month"`
 #'
 #' @examples
 #' library(data.table)
@@ -21,13 +26,16 @@
 #' check_date_coverage(dates, "2023-01-01", "2023-04-30", by = "quarter")
 #'
 #' @export
-check_date_coverage <- function(date_var, start_date, end_date, by = "month") {
+check_date_coverage <- function(date_var, start_date, end_date, by = "month",
+                                quiet = FALSE) {
   valid_by <- c("day", "week", "month", "quarter", "year")
   if (!by %in% valid_by) {
     stop("`by` must be one of: ", paste(valid_by, collapse = ", "))
   }
-  cat("Checking dates between", as.character(start_date), "and",
-      as.character(end_date), "(by", by, ")\n")
+  if (!quiet) {
+    cat("Checking dates between", as.character(start_date), "and",
+        as.character(end_date), "(by", by, ")\n")
+  }
   all_periods <- seq(as.IDate(start_date), as.IDate(end_date), by = by)
   trunc_format <- switch(by,
     day     = "%Y-%m-%d",
@@ -47,18 +55,20 @@ check_date_coverage <- function(date_var, start_date, end_date, by = "month") {
     actual_periods <- unique(as.IDate(format(date_var, trunc_format)))
   }
   missing_periods <- as.IDate(setdiff(all_periods, actual_periods))
-  if (length(missing_periods) == 0L) {
-    cat("All", by, "periods show up in the data!\n")
-  } else {
-    display_format <- switch(by,
-      day     = "%Y-%m-%d",
-      week    = "%Y-%m-%d",
-      month   = "%b-%Y",
-      quarter = "%b-%Y",
-      year    = "%Y"
-    )
-    cat("There are", length(missing_periods), by, "periods missing. These are:\n")
-    cat(paste(format(missing_periods, display_format), collapse = ", "), "\n")
+  if (!quiet) {
+    if (length(missing_periods) == 0L) {
+      cat("All", by, "periods show up in the data!\n")
+    } else {
+      display_format <- switch(by,
+        day     = "%Y-%m-%d",
+        week    = "%Y-%m-%d",
+        month   = "%b-%Y",
+        quarter = "%b-%Y",
+        year    = "%Y"
+      )
+      cat("There are", length(missing_periods), by, "periods missing. These are:\n")
+      cat(paste(format(missing_periods, display_format), collapse = ", "), "\n")
+    }
   }
   invisible(missing_periods)
 }
@@ -74,7 +84,9 @@ check_date_coverage <- function(date_var, start_date, end_date, by = "month") {
 #' @inheritParams check_date_coverage
 #'
 #' @returns An [IDate][data.table::IDate] vector of missing months, returned
-#'   invisibly. Also prints missing months as a side effect.
+#'   invisibly.
+#'
+#' @seealso [check_date_coverage()] for other period granularities
 #'
 #' @examples
 #' library(data.table)
@@ -82,8 +94,8 @@ check_date_coverage <- function(date_var, start_date, end_date, by = "month") {
 #' check_months_coverage(dates, "2023-01-01", "2023-04-30")
 #'
 #' @export
-check_months_coverage <- function(date_var, start_date, end_date) {
-  check_date_coverage(date_var, start_date, end_date, by = "month")
+check_months_coverage <- function(date_var, start_date, end_date, quiet = FALSE) {
+  check_date_coverage(date_var, start_date, end_date, by = "month", quiet = quiet)
 }
 
 # Statistic names returned by summarize_vector() — used as row names in
@@ -233,8 +245,10 @@ summarize_vector <- function(x) {
 #'
 #' @returns A data.table with one row per column containing summary statistics.
 #'
+#' @seealso [summarize_vector()] for single-vector summaries,
+#'   [diagnose_nas()] for missing value diagnostics
+#'
 #' @examples
-#' \dontrun{
 #' library(data.table)
 #' dt <- data.table(
 #'   id = 1:100,
@@ -243,7 +257,6 @@ summarize_vector <- function(x) {
 #' )
 #' get_summary_table(dt)
 #' get_summary_table(dt, cols = c("value", "category"))
-#' }
 #'
 #' @export
 get_summary_table <- function(dt, cols = NULL) {
@@ -273,8 +286,16 @@ get_summary_table <- function(dt, cols = NULL) {
 #'
 #' @param dt A data.table to diagnose.
 #'
-#' @returns A data.table with columns `variable`, `n_na`, `pct_na`, and
-#'   `n_valid`, returned invisibly. Also prints a summary as a side effect.
+#' @returns An S3 object of class `diagnose_na` containing:
+#' \describe{
+#'   \item{table}{A data.table with columns `variable`, `n_na`, `pct_na`, and
+#'     `n_valid`, sorted by `pct_na` descending.}
+#'   \item{n_cols}{Total number of columns in the input.}
+#'   \item{n_with_na}{Number of columns that have at least one NA.}
+#' }
+#'
+#' @seealso [get_summary_table()] for comprehensive column summaries,
+#'   [diagnose_strings()] for string column quality
 #'
 #' @examples
 #' library(data.table)
@@ -290,17 +311,36 @@ diagnose_nas <- function(dt) {
   stopifnot(is.data.table(dt))
   n_rows <- nrow(dt)
   na_counts <- vapply(dt, function(col) sum(is.na(col)), integer(1L))
-  result <- data.table(
+  tbl <- data.table(
     variable = names(na_counts),
     n_na     = as.integer(na_counts),
     pct_na   = round(100 * na_counts / n_rows, 1),
     n_valid  = as.integer(n_rows - na_counts)
   )
-  setorderv(result, "pct_na", order = -1L)
-  n_with_na <- sum(result$n_na > 0L)
-  cat(sprintf("%d of %d columns have missing values\n", n_with_na, ncol(dt)))
-  if (n_with_na > 0L) {
-    cols_with_na <- result[n_na > 0L]
+  setorderv(tbl, "pct_na", order = -1L)
+
+  structure(
+    list(
+      table     = tbl,
+      n_cols    = ncol(dt),
+      n_with_na = sum(tbl$n_na > 0L)
+    ),
+    class = "diagnose_na"
+  )
+}
+
+#' Print Method for diagnose_na Objects
+#'
+#' @param x A `diagnose_na` object from [diagnose_nas()].
+#' @param ... Additional arguments (unused).
+#'
+#' @returns The `diagnose_na` object, invisibly.
+#'
+#' @export
+print.diagnose_na <- function(x, ...) {
+  cat(sprintf("%d of %d columns have missing values\n", x$n_with_na, x$n_cols))
+  if (x$n_with_na > 0L) {
+    cols_with_na <- x$table[n_na > 0L]
     cat(sprintf("  %-30s %8s %8s\n", "variable", "n_na", "pct_na"))
     for (i in seq_len(nrow(cols_with_na))) {
       cat(sprintf("  %-30s %8d %7.1f%%\n",
@@ -309,5 +349,5 @@ diagnose_nas <- function(dt) {
                   cols_with_na$pct_na[i]))
     }
   }
-  invisible(result)
+  invisible(x)
 }

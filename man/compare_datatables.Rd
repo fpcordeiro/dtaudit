@@ -16,8 +16,9 @@ rows. If NULL (default), automatically detects character, factor, and
 integer columns as keys.}
 }
 \value{
-Invisibly returns a list containing:
+An S3 object of class \code{compare_dt} containing:
 \describe{
+\item{name1, name2}{Names of the compared objects}
 \item{common_columns}{Column names present in both tables}
 \item{only_dt1}{Column names only in dt1}
 \item{only_dt2}{Column names only in dt2}
@@ -27,6 +28,8 @@ types, with columns: column, type_dt1, type_dt2. NULL if no mismatches.}
 \item{nrow_dt2}{Number of rows in dt2}
 \item{key_summary}{Summary of key overlap (if keys found)}
 \item{numeric_summary}{Data.table of numeric column discrepancies}
+\item{numeric_method}{How numeric columns were compared ("keys", "row_index", or NA)}
+\item{rows_matched}{Number of rows matched on keys (when method is "keys")}
 }
 }
 \description{
@@ -39,4 +42,8 @@ dt1 <- data.table(id = 1:3, value = c(10.0, 20.0, 30.0))
 dt2 <- data.table(id = 1:3, value = c(10.1, 20.0, 30.5))
 compare_datatables(dt1, dt2)
 
+}
+\seealso{
+\code{\link[=validate_join]{validate_join()}} for analyzing join relationships,
+\code{\link[=validate_primary_keys]{validate_primary_keys()}} for key uniqueness validation
 }

@@ -10,8 +10,13 @@ diagnose_nas(dt)
 \item{dt}{A data.table to diagnose.}
 }
 \value{
-A data.table with columns \code{variable}, \code{n_na}, \code{pct_na}, and
-\code{n_valid}, returned invisibly. Also prints a summary as a side effect.
+An S3 object of class \code{diagnose_na} containing:
+\describe{
+\item{table}{A data.table with columns \code{variable}, \code{n_na}, \code{pct_na}, and
+\code{n_valid}, sorted by \code{pct_na} descending.}
+\item{n_cols}{Total number of columns in the input.}
+\item{n_with_na}{Number of columns that have at least one NA.}
+}
 }
 \description{
 Reports NA counts and percentages for each column in a data.table,
@@ -26,4 +31,8 @@ dt <- data.table(
 )
 diagnose_nas(dt)
 
+}
+\seealso{
+\code{\link[=get_summary_table]{get_summary_table()}} for comprehensive column summaries,
+\code{\link[=diagnose_strings]{diagnose_strings()}} for string column quality
 }
