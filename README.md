@@ -32,7 +32,8 @@ library(data.table)
 
 orders <- data.table(
   order_id = 1:5,
-  customer_id = c(101, 102, 101, 103, 104)
+  customer_id = c(101, 102, 101, 103, 104),
+  revenue = c(200, 150, 300, 450, 100)
 )
 
 customers <- data.table(
@@ -55,13 +56,38 @@ print(result)
 #>   Distinct key combos in customers            : 3
 #>   Overlapping distinct key combos             : 2
 #>   Matched row pairs (cartesian)               : 3
-#>   Match rate from orders                      : 60
-#>   Match rate from customers                   : 66.66667
+#>   Match rate from orders                      : 60.00%
+#>   Match rate from customers                   : 66.67%
 #>   Rows only in orders (no match in customers) : 2
 #>   Rows only in customers (no match in orders) : 1
 #> ------------------------------------
 #> Duplicates: orders=yes  customers=no
 ```
+
+Track a numeric column through the join to quantify the business impact of
+unmatched rows. Use `stat` when both tables share the same column name, or
+`stat.x`/`stat.y` for different columns:
+
+```r
+validate_join(orders, customers, by = "customer_id", stat.x = "revenue")
+#> ============== Join Validation Summary ==============
+#> Tables: orders <--> customers
+#> ...
+#>   Match rate from orders                      : 60.00%
+#>   Match rate from customers                   : 66.67%
+#>   Rows only in orders (no match in customers) : 2
+#>   Rows only in customers (no match in orders) : 1
+#>
+#>   --- Stat: revenue (orders) ---
+#>   Total revenue in orders     : 1,200
+#>   Matched revenue in orders   : 650  (54.17%)
+#>   Unmatched revenue in orders : 550  (45.83%)
+#> ------------------------------------
+#> Duplicates: orders=yes  customers=no
+```
+
+Here, 60% of rows match but only 54% of revenue---the unmatched orders carry
+disproportionately high revenue, something row counts alone wouldn't reveal.
 
 ### Primary Key Validation
 

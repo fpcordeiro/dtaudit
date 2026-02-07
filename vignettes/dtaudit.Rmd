@@ -69,15 +69,20 @@ The output shows a many-to-one relationship (multiple orders per product), with
 some product IDs appearing only in one table. This is expected, but now you
 know exactly what the merge will look like.
 
-You can also track a numeric column through the join to see the business impact
-of matched and unmatched rows:
+You can also track numeric columns through the join with `stat.x` and `stat.y`
+(or `stat` when both tables share the same column name). This shows how much of
+a metric falls in matched vs. unmatched rows --- often more revealing than row
+counts alone:
 
 ```{r validate-join-stat}
 validate_join(orders, products, by = "product_id",
               stat.x = "amount", stat.y = "price")
 ```
 
-TODO : add exmaple that captures output object and shows unmatched keys.
+Here 75% of order rows match, but only 71% of total order `amount` --- the
+unmatched orders carry disproportionately high amounts. On the product side, 80%
+of rows match but 92% of `price`, meaning the unmatched product is relatively
+cheap. These insights help you decide whether unmatched keys are safe to ignore.
 
 ## Step 3: Filter with diagnostics
 

@@ -5,3 +5,5 @@
 ^\.claude$
 ^CLAUDE\.md$
 ^\.github$
+^doc$
+^Meta$

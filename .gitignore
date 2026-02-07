@@ -9,3 +9,5 @@ CLAUDE.md
 /*.tar.gz
 # Output files from R CMD check
 /*.Rcheck/
+/doc/
+/Meta/
