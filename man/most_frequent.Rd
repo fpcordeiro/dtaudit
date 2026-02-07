@@ -17,8 +17,4 @@ vector is empty.
 Returns the most frequently occurring value in a vector. Intended for
 categorical or integer variables; issues a warning if used on numeric data.
 }
-\examples{
-most_frequent(c("a", "b", "a", "c", "a"))
-most_frequent(c(1L, 2L, 2L, 3L))
-
-}
+\keyword{internal}

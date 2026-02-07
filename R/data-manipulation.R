@@ -73,36 +73,9 @@ embed_into_cartesian <- function(dt, group_vars, dt_frame = NULL, fill = NA) {
 #' @returns The most frequent value as a character string, or `NA` if the
 #'   vector is empty.
 #'
-#' @examples
-#' most_frequent(c("a", "b", "a", "c", "a"))
-#' most_frequent(c(1L, 2L, 2L, 3L))
-#'
-#' @export
+#' @keywords internal
 most_frequent <- function(x) {
   if (is.numeric(x)) warning("x is a numeric vector. This function is primarily for categorical/integer variables")
   tab <- table(x)
   if (length(tab) == 0L) NA_character_ else names(tab)[which.max(tab)]
-}
-
-#' Convert Empty Strings to NA
-#'
-#' Replaces empty strings ("") with `NA` in all character columns of a
-#' data.table. Modifies the data.table by reference.
-#'
-#' @param dt A data.table.
-#'
-#' @returns The modified data.table (invisibly). The original object is
-#'   modified by reference.
-#'
-#' @examples
-#' library(data.table)
-#' dt <- data.table(a = c("x", "", "z"), b = c("", "y", ""))
-#' empty_char_to_NA(dt)
-#' dt
-#'
-#' @export
-empty_char_to_NA <- function(dt) {
-  char_cols <- dt[, names(.SD), .SDcols = is.character]
-  dt[, (char_cols) := lapply(.SD, function(x) fifelse(x == "", NA_character_, x)), .SDcols = char_cols]
-  invisible(dt)
 }

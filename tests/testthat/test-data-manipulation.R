@@ -70,43 +70,16 @@ test_that("embed_into_cartesian with custom dt_frame", {
 
 test_that("most_frequent returns most common value", {
   x <- c("a", "b", "a", "c", "a", "b")
-  result <- most_frequent(x)
+  result <- dtaudit:::most_frequent(x)
   expect_equal(result, "a")
 })
 test_that("most_frequent returns NA_character_ for empty input", {
   x <- character(0)
-  result <- most_frequent(x)
+  result <- dtaudit:::most_frequent(x)
   expect_true(is.na(result))
   expect_type(result, "character")
 })
 
 test_that("most_frequent warns for numeric input", {
-  expect_warning(most_frequent(c(1, 2, 1)), "numeric vector")
-})
-
-test_that("empty_char_to_NA converts empty strings", {
-  dt <- data.table::data.table(
-    id = 1:3,
-    name = c("Alice", "", "Charlie"),
-    city = c("", "Boston", "")
-  )
-
-  empty_char_to_NA(dt)
-
-  expect_true(is.na(dt$name[2]))
-  expect_true(is.na(dt$city[1]))
-  expect_true(is.na(dt$city[3]))
-  expect_equal(dt$name[1], "Alice")
-  expect_equal(dt$city[2], "Boston")
-})
-
-test_that("empty_char_to_NA ignores non-character columns", {
-  dt <- data.table::data.table(
-    id = 1:3,
-    value = c(0, NA, 10)
-  )
-
-  empty_char_to_NA(dt)
-
-  expect_equal(dt$value[1], 0)  # 0 is not converted to NA
+  expect_warning(dtaudit:::most_frequent(c(1, 2, 1)), "numeric vector")
 })
