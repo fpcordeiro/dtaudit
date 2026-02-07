@@ -1,8 +1,11 @@
+.DS_Store
+.vscode/
+.claude/
+# R specific files
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
-*.Rproj.user
 inst/doc
 CLAUDE.md
 # Output files from R CMD build
