@@ -89,6 +89,30 @@ validate_join(orders, customers, by = "customer_id", stat.x = "revenue")
 Here, 60% of rows match but only 54% of revenue---the unmatched orders carry
 disproportionately high revenue, something row counts alone wouldn't reveal.
 
+### Filter with Diagnostics
+
+Filter data while tracking what gets dropped---including optional statistics like revenue or counts.
+
+```r
+sales <- data.table(
+  region = c("East", "West", "East", "West"),
+  revenue = c(1000, 500, 2000, 300),
+  valid = c(TRUE, FALSE, TRUE, TRUE)
+)
+
+# Keep rows where valid == TRUE
+clean_sales <- filter_keep(sales, valid == TRUE, stat = revenue)
+#> filter_keep(sales, valid == TRUE)
+#>   Dropped 1 of 4 rows (25.00%).
+#>   Dropped 500 of 3,800 for revenue (13.16%).
+
+# Or equivalently, drop rows where valid == FALSE
+clean_sales <- filter_drop(sales, valid == FALSE, stat = revenue)
+#> filter_drop(sales, valid == FALSE)
+#>   Dropped 1 of 4 rows (25.00%).
+#>   Dropped 500 of 3,800 for revenue (13.16%).
+```
+
 ### Primary Key Validation
 
 Test whether a set of columns uniquely identifies every row in a data.table.
@@ -141,30 +165,6 @@ validate_var_relationship(dt, "student", "course")
 #>   course -> student: one-to-many
 #> --------------------------------------------------------------
 #> Relationship: MANY-TO-MANY
-```
-
-### Filter with Diagnostics
-
-Filter data while tracking what gets dropped---including optional statistics like revenue or counts.
-
-```r
-sales <- data.table(
-  region = c("East", "West", "East", "West"),
-  revenue = c(1000, 500, 2000, 300),
-  valid = c(TRUE, FALSE, TRUE, TRUE)
-)
-
-# Keep rows where valid == TRUE
-clean_sales <- filter_keep(sales, valid == TRUE, stat = revenue)
-#> filter_keep(sales, valid == TRUE)
-#>   Dropped 1 of 4 rows (25.00%).
-#>   Dropped 500 of 3,800 for revenue (13.16%).
-
-# Or equivalently, drop rows where valid == FALSE
-clean_sales <- filter_drop(sales, valid == FALSE, stat = revenue)
-#> filter_drop(sales, valid == FALSE)
-#>   Dropped 1 of 4 rows (25.00%).
-#>   Dropped 500 of 3,800 for revenue (13.16%).
 ```
 
 ### Compare Data Tables
