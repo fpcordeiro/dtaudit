@@ -1,3 +1,9 @@
+# dtaudit 0.1.1
+
+* `validate_join()` gains `stat`, `stat.x`, and `stat.y` arguments to track
+  numeric columns through the join, reporting total, matched, and unmatched
+  sums for each table.
+
 # dtaudit 0.1.0
 
 * Initial CRAN submission.

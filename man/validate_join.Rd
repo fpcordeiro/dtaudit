@@ -4,7 +4,16 @@
 \alias{validate_join}
 \title{Validate Join Operations Between Two Data Tables}
 \usage{
-validate_join(x, y, by = NULL, by.x = NULL, by.y = NULL)
+validate_join(
+  x,
+  y,
+  by = NULL,
+  by.x = NULL,
+  by.y = NULL,
+  stat = NULL,
+  stat.x = NULL,
+  stat.y = NULL
+)
 }
 \arguments{
 \item{x}{A data.table (left table).}
@@ -16,6 +25,13 @@ validate_join(x, y, by = NULL, by.x = NULL, by.y = NULL)
 \item{by.x}{Character vector of column names in \code{x} to join on.}
 
 \item{by.y}{Character vector of column names in \code{y} to join on.}
+
+\item{stat}{Character string naming a numeric column present in both tables.
+Reports total, matched, and unmatched sums for each table.}
+
+\item{stat.x}{Character string naming a numeric column in \code{x}.}
+
+\item{stat.y}{Character string naming a numeric column in \code{y}.}
 }
 \value{
 An S3 object of class \code{validate_join} containing:
@@ -23,6 +39,10 @@ An S3 object of class \code{validate_join} containing:
 \item{x_name, y_name}{Names of the input tables from the original call}
 \item{by.x, by.y}{Key columns used for the join}
 \item{counts}{List with row counts, match rates, and overlap statistics}
+\item{stat}{When \code{stat}, \code{stat.x}, or \code{stat.y} is provided, a list with
+elements \code{stat_col_x} and/or \code{stat_col_y} (column names) and sublists
+\code{x} and/or \code{y} each containing \code{total}, \code{matched}, \code{only}, \code{rate}, and
+\code{n_na}. \code{NULL} when no stat is provided.}
 \item{duplicates}{List with duplicate key information for each table}
 \item{summary_table}{A data.table summarizing the join diagnostics}
 \item{relation}{Character string: "one-to-one", "one-to-many", "many-to-one",
@@ -33,8 +53,10 @@ An S3 object of class \code{validate_join} containing:
 }
 \description{
 Analyzes a potential join between two data.tables without performing the
-actual merge. Reports relationship type (one-to-one, one-to-many, etc.),
-match rates, duplicate keys, and unmatched rows.
+full join between original tables. Reports relationship type
+(one-to-one, one-to-many, etc.), match rates, duplicate keys, and
+unmatched rows. Optionally tracks a numeric statistic column through the
+join to quantify impact.
 }
 \examples{
 library(data.table)
@@ -42,6 +64,11 @@ dt1 <- data.table(id = c(1, 2, 3, 3), value = c("a", "b", "c", "d"))
 dt2 <- data.table(id = c(2, 3, 4), score = c(10, 20, 30))
 result <- validate_join(dt1, dt2, by = "id")
 print(result)
+
+# Track a numeric column through the join
+orders <- data.table(id = 1:4, revenue = c(100, 200, 300, 400))
+products <- data.table(id = 2:5, cost = c(10, 20, 30, 40))
+validate_join(orders, products, by = "id", stat.x = "revenue", stat.y = "cost")
 
 }
 \seealso{

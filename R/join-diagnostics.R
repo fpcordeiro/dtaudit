@@ -1,20 +1,30 @@
 #' Validate Join Operations Between Two Data Tables
 #'
 #' Analyzes a potential join between two data.tables without performing the
-#' actual merge. Reports relationship type (one-to-one, one-to-many, etc.),
-#' match rates, duplicate keys, and unmatched rows.
+#' full join between original tables. Reports relationship type
+#' (one-to-one, one-to-many, etc.), match rates, duplicate keys, and 
+#' unmatched rows. Optionally tracks a numeric statistic column through the
+#' join to quantify impact.
 #'
 #' @param x A data.table (left table).
 #' @param y A data.table (right table).
 #' @param by Character vector of column names to join on (used for both tables).
 #' @param by.x Character vector of column names in `x` to join on.
 #' @param by.y Character vector of column names in `y` to join on.
+#' @param stat Character string naming a numeric column present in both tables.
+#'   Reports total, matched, and unmatched sums for each table.
+#' @param stat.x Character string naming a numeric column in `x`.
+#' @param stat.y Character string naming a numeric column in `y`.
 #'
 #' @returns An S3 object of class `validate_join` containing:
 #' \describe{
 #'   \item{x_name, y_name}{Names of the input tables from the original call}
 #'   \item{by.x, by.y}{Key columns used for the join}
 #'   \item{counts}{List with row counts, match rates, and overlap statistics}
+#'   \item{stat}{When `stat`, `stat.x`, or `stat.y` is provided, a list with
+#'     elements `stat_col_x` and/or `stat_col_y` (column names) and sublists
+#'     `x` and/or `y` each containing `total`, `matched`, `only`, `rate`, and
+#'     `n_na`. `NULL` when no stat is provided.}
 #'   \item{duplicates}{List with duplicate key information for each table}
 #'   \item{summary_table}{A data.table summarizing the join diagnostics}
 #'   \item{relation}{Character string: "one-to-one", "one-to-many", "many-to-one",
@@ -34,8 +44,14 @@
 #' result <- validate_join(dt1, dt2, by = "id")
 #' print(result)
 #'
+#' # Track a numeric column through the join
+#' orders <- data.table(id = 1:4, revenue = c(100, 200, 300, 400))
+#' products <- data.table(id = 2:5, cost = c(10, 20, 30, 40))
+#' validate_join(orders, products, by = "id", stat.x = "revenue", stat.y = "cost")
+#'
 #' @export
-validate_join <- function(x, y, by = NULL, by.x = NULL, by.y = NULL) {
+validate_join <- function(x, y, by = NULL, by.x = NULL, by.y = NULL,
+                          stat = NULL, stat.x = NULL, stat.y = NULL) {
   stopifnot(is.data.table(x), is.data.table(y))
 
   # Capture names from the call
@@ -59,6 +75,32 @@ validate_join <- function(x, y, by = NULL, by.x = NULL, by.y = NULL) {
   if (!all(by.y %chin% names(y))) {
     miss_y <- setdiff(by.y, names(y))
     stop(sprintf("`y` missing key(s): %s", paste(miss_y, collapse = ", ")))
+  }
+
+  # Resolve stat columns (mirrors by/by.x/by.y pattern)
+  if (!is.null(stat)) {
+    if (!is.null(stat.x) || !is.null(stat.y))
+      stop("Use `stat` or `stat.x`/`stat.y`, not both.")
+    stat.x <- stat.y <- stat
+  }
+  have_stat_x <- !is.null(stat.x)
+  have_stat_y <- !is.null(stat.y)
+
+  if (have_stat_x) {
+    if (!is.character(stat.x) || length(stat.x) != 1L)
+      stop("`stat.x` must be a single column name (character string).")
+    if (!stat.x %chin% names(x))
+      stop(sprintf("Column '%s' not found in `x`.", stat.x))
+    if (!is.numeric(x[[stat.x]]))
+      stop(sprintf("Column '%s' in `x` is not numeric.", stat.x))
+  }
+  if (have_stat_y) {
+    if (!is.character(stat.y) || length(stat.y) != 1L)
+      stop("`stat.y` must be a single column name (character string).")
+    if (!stat.y %chin% names(y))
+      stop(sprintf("Column '%s' not found in `y`.", stat.y))
+    if (!is.numeric(y[[stat.y]]))
+      stop(sprintf("Column '%s' in `y` is not numeric.", stat.y))
   }
 
   # Row counts
@@ -96,6 +138,60 @@ validate_join <- function(x, y, by = NULL, by.x = NULL, by.y = NULL) {
   n_key_overlap  <- sum(Nx0 > 0L & Ny0 > 0L)
   match_rate_x   <- 100 * ((x_rows - n_only_x) / x_rows)
   match_rate_y   <- 100 * ((y_rows - n_only_y) / y_rows)
+
+  # Stat diagnostics
+  stat_info <- NULL
+  if (have_stat_x || have_stat_y) {
+    matched_key_rows <- comb[Nx0 > 0L & Ny0 > 0L]
+    stat_info <- list()
+
+    if (have_stat_x) {
+      stat_total_x   <- x[, sum(get(stat.x), na.rm = TRUE)]
+      stat_na_x      <- x[, sum(is.na(get(stat.x)))]
+      matched_keys_x <- matched_key_rows[, by.x, with = FALSE]
+      stat_matched_x <- if (nrow(matched_keys_x) > 0L) {
+        x[matched_keys_x, sum(get(stat.x), na.rm = TRUE),
+          on = by.x, nomatch = NULL]
+      } else {
+        0
+      }
+      stat_only_x    <- stat_total_x - stat_matched_x
+      stat_rate_x    <- if (stat_total_x != 0) {
+        100 * stat_matched_x / stat_total_x
+      } else {
+        NA_real_
+      }
+      stat_info$stat_col_x <- stat.x
+      stat_info$x <- list(
+        total = stat_total_x, matched = stat_matched_x,
+        only = stat_only_x, rate = stat_rate_x, n_na = stat_na_x
+      )
+    }
+
+    if (have_stat_y) {
+      stat_total_y   <- y[, sum(get(stat.y), na.rm = TRUE)]
+      stat_na_y      <- y[, sum(is.na(get(stat.y)))]
+      matched_keys_y <- copy(matched_key_rows[, by.x, with = FALSE])
+      if (!identical(by.x, by.y)) setnames(matched_keys_y, by.x, by.y)
+      stat_matched_y <- if (nrow(matched_keys_y) > 0L) {
+        y[matched_keys_y, sum(get(stat.y), na.rm = TRUE),
+          on = by.y, nomatch = NULL]
+      } else {
+        0
+      }
+      stat_only_y    <- stat_total_y - stat_matched_y
+      stat_rate_y    <- if (stat_total_y != 0) {
+        100 * stat_matched_y / stat_total_y
+      } else {
+        NA_real_
+      }
+      stat_info$stat_col_y <- stat.y
+      stat_info$y <- list(
+        total = stat_total_y, matched = stat_matched_y,
+        only = stat_only_y, rate = stat_rate_y, n_na = stat_na_y
+      )
+    }
+  }
 
   # Relationship classification
   merge_type <- if (n_key_overlap == 0L) {
@@ -141,8 +237,8 @@ validate_join <- function(x, y, by = NULL, by.x = NULL, by.y = NULL) {
       fmt_int(y_unique),
       fmt_int(n_key_overlap),
       fmt_int(n_matched),
-      fmt_int(match_rate_x),
-      fmt_int(match_rate_y),
+      sprintf("%.2f%%", match_rate_x),
+      sprintf("%.2f%%", match_rate_y),
       fmt_int(n_only_x),
       fmt_int(n_only_y)
     )
@@ -164,6 +260,7 @@ validate_join <- function(x, y, by = NULL, by.x = NULL, by.y = NULL) {
       n_only_x = n_only_x,
       n_only_y = n_only_y
     ),
+    stat = stat_info,
     duplicates = list(
       x_has_dups = x_has_dups, y_has_dups = y_has_dups,
       x_dupe_keys = xc[N > 1L],
@@ -201,6 +298,66 @@ print.validate_join <- function(x, ...) {
   w <- max(nchar(tbl$Item), 12L)
   for (i in seq_len(nrow(tbl))) {
     cat(sprintf("  %-*s : %s\n", w, tbl$Item[i], tbl$Value[i]))
+  }
+
+  # Stat diagnostics section
+  if (!is.null(x$stat)) {
+    fmt_num <- function(z) format(z, big.mark = ",", scientific = FALSE, trim = TRUE)
+    has_x <- !is.null(x$stat$x)
+    has_y <- !is.null(x$stat$y)
+    same_col <- has_x && has_y && identical(x$stat$stat_col_x, x$stat$stat_col_y)
+
+    # Build header
+    if (same_col) {
+      stat_hdr <- sprintf("--- Stat: %s ---", x$stat$stat_col_x)
+    } else if (has_x && has_y) {
+      stat_hdr <- sprintf("--- Stat: %s (%s), %s (%s) ---",
+                          x$stat$stat_col_x, x$x_name,
+                          x$stat$stat_col_y, x$y_name)
+    } else if (has_x) {
+      stat_hdr <- sprintf("--- Stat: %s (%s) ---", x$stat$stat_col_x, x$x_name)
+    } else {
+      stat_hdr <- sprintf("--- Stat: %s (%s) ---", x$stat$stat_col_y, x$y_name)
+    }
+    cat("\n  ", stat_hdr, "\n", sep = "")
+
+    # Build stat items and compute max width
+    stat_items <- character(0)
+    stat_vals  <- character(0)
+
+    if (has_x) {
+      sx <- x$stat$x
+      scx <- x$stat$stat_col_x
+      stat_items <- c(stat_items,
+        sprintf("Total %s in %s", scx, x$x_name),
+        sprintf("Matched %s in %s", scx, x$x_name),
+        sprintf("Unmatched %s in %s", scx, x$x_name)
+      )
+      stat_vals <- c(stat_vals,
+        fmt_num(sx$total),
+        sprintf("%s  (%.2f%%)", fmt_num(sx$matched), sx$rate),
+        sprintf("%s  (%.2f%%)", fmt_num(sx$only), if (!is.na(sx$rate)) 100 - sx$rate else NA_real_)
+      )
+    }
+    if (has_y) {
+      sy <- x$stat$y
+      scy <- x$stat$stat_col_y
+      stat_items <- c(stat_items,
+        sprintf("Total %s in %s", scy, x$y_name),
+        sprintf("Matched %s in %s", scy, x$y_name),
+        sprintf("Unmatched %s in %s", scy, x$y_name)
+      )
+      stat_vals <- c(stat_vals,
+        fmt_num(sy$total),
+        sprintf("%s  (%.2f%%)", fmt_num(sy$matched), sy$rate),
+        sprintf("%s  (%.2f%%)", fmt_num(sy$only), if (!is.na(sy$rate)) 100 - sy$rate else NA_real_)
+      )
+    }
+
+    sw <- max(nchar(stat_items), 12L)
+    for (i in seq_along(stat_items)) {
+      cat(sprintf("  %-*s : %s\n", sw, stat_items[i], stat_vals[i]))
+    }
   }
 
   # Small footer about duplicates

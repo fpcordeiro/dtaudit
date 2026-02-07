@@ -14,11 +14,10 @@ knitr::opts_chunk$set(
 )
 ```
 
-dtaudit provides diagnostic tools for data analysis workflows built on
-data.table. Unlike assertion-based packages that test whether data meets
-specific rules, dtaudit focuses on **understanding what happens** to your data
-during joins, filters, and transformations --- helping you catch problems before
-they become hard-to-find bugs.
+`dtaudit` provides diagnostic tools for data analysis workflows built on
+`data.table`. Unlike assertion-based packages that test whether data meets
+specific rules, dtaudit focuses on **interactive development** and 
+**understanding what happens** to your data during joins, filters, and transformations.
 
 ```{r setup}
 library(dtaudit)
@@ -28,7 +27,7 @@ library(data.table)
 ## Example data
 
 Suppose you have two tables: one with customer orders and another with product
-information. These are typical inputs to a merge operation.
+information. These are typical inputs to a join operation.
 
 ```{r data}
 orders <- data.table(
@@ -47,7 +46,7 @@ products <- data.table(
 
 ## Step 1: Validate primary keys
 
-Before merging, check that your join keys actually identify rows uniquely in
+Before joining, check that your join keys actually identify rows uniquely in
 each table.
 
 ```{r validate-pk}
@@ -58,8 +57,9 @@ validate_primary_keys(products, "product_id")
 ## Step 2: Validate the join
 
 Use `validate_join()` to understand the relationship between the two tables
-**before** merging. This tells you the join type, match rates, and which keys
-are unmatched.
+**before** joining. This function doesn't run the full outer join on the original tables,
+making it typically lighter and faster than ad-hoc solutions.
+This tells you the join type, match rates, and which keys are unmatched.
 
 ```{r validate-join}
 validate_join(orders, products, by = "product_id")
@@ -68,6 +68,16 @@ validate_join(orders, products, by = "product_id")
 The output shows a many-to-one relationship (multiple orders per product), with
 some product IDs appearing only in one table. This is expected, but now you
 know exactly what the merge will look like.
+
+You can also track a numeric column through the join to see the business impact
+of matched and unmatched rows:
+
+```{r validate-join-stat}
+validate_join(orders, products, by = "product_id",
+              stat.x = "amount", stat.y = "price")
+```
+
+TODO : add exmaple that captures output object and shows unmatched keys.
 
 ## Step 3: Filter with diagnostics
 
