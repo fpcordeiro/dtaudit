@@ -23,6 +23,10 @@
 #'   \item{keys_only_in_y}{Keys present in y but not in x}
 #' }
 #'
+#' @seealso [validate_primary_keys()] for key uniqueness validation,
+#'   [validate_var_relationship()] for variable relationship analysis,
+#'   [compare_datatables()] for structural comparison
+#'
 #' @examples
 #' library(data.table)
 #' dt1 <- data.table(id = c(1, 2, 3, 3), value = c("a", "b", "c", "d"))

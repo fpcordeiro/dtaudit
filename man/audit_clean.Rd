@@ -41,3 +41,7 @@ result <- audit_clean(firms, clean_firm_name)
 result$cleaned
 
 }
+\seealso{
+\code{\link[=diagnose_strings]{diagnose_strings()}} for string quality diagnostics,
+\code{\link[=clean_var_names]{clean_var_names()}} and \code{\link[=clean_firm_name]{clean_firm_name()}} for built-in cleaning functions
+}

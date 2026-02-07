@@ -44,3 +44,8 @@ result <- validate_join(dt1, dt2, by = "id")
 print(result)
 
 }
+\seealso{
+\code{\link[=validate_primary_keys]{validate_primary_keys()}} for key uniqueness validation,
+\code{\link[=validate_var_relationship]{validate_var_relationship()}} for variable relationship analysis,
+\code{\link[=compare_datatables]{compare_datatables()}} for structural comparison
+}

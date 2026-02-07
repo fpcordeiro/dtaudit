@@ -114,6 +114,9 @@ clean_firm_name <- function(text) {
 #'   \item{case_variant_examples}{data.table with examples of case variants}
 #' }
 #'
+#' @seealso [audit_clean()] for auditing the effect of cleaning functions,
+#'   [diagnose_nas()] for missing value diagnostics
+#'
 #' @examples
 #' library(data.table)
 #' firms <- c("Apple", "APPLE", "apple", "  Microsoft ", "Google", NA, "")
@@ -264,6 +267,9 @@ print.diagnose_strings <- function(x, ...) {
 #'   \item{change_examples}{data.table with sample before/after pairs}
 #'   \item{cleaned}{The cleaned character vector}
 #' }
+#'
+#' @seealso [diagnose_strings()] for string quality diagnostics,
+#'   [clean_var_names()] and [clean_firm_name()] for built-in cleaning functions
 #'
 #' @examples
 #' library(data.table)

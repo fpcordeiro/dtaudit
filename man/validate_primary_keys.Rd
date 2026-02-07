@@ -37,7 +37,6 @@ library(data.table)
 dt <- data.table(
   id = c(1L, 2L, 3L, 4L),
   group = c("A", "A", "B", "B"),
-
   value = c(10, 20, 30, 40)
 )
 
@@ -50,4 +49,8 @@ validate_primary_keys(dt, "group")
 # Composite key that IS a primary key
 validate_primary_keys(dt, c("group", "id"))
 
+}
+\seealso{
+\code{\link[=validate_join]{validate_join()}} for join relationship analysis,
+\code{\link[=validate_var_relationship]{validate_var_relationship()}} for variable relationship analysis
 }

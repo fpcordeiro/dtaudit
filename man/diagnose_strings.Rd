@@ -39,3 +39,7 @@ firms <- c("Apple", "APPLE", "apple", "  Microsoft ", "Google", NA, "")
 diagnose_strings(firms)
 
 }
+\seealso{
+\code{\link[=audit_clean]{audit_clean()}} for auditing the effect of cleaning functions,
+\code{\link[=diagnose_nas]{diagnose_nas()}} for missing value diagnostics
+}

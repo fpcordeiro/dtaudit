@@ -20,7 +20,6 @@ Creates a comprehensive summary of all columns in a data.table, including
 type, missing values, descriptive statistics, and example values.
 }
 \examples{
-\dontrun{
 library(data.table)
 dt <- data.table(
   id = 1:100,
@@ -29,6 +28,9 @@ dt <- data.table(
 )
 get_summary_table(dt)
 get_summary_table(dt, cols = c("value", "category"))
-}
 
+}
+\seealso{
+\code{\link[=summarize_vector]{summarize_vector()}} for single-vector summaries,
+\code{\link[=diagnose_nas]{diagnose_nas()}} for missing value diagnostics
 }

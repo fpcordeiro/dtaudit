@@ -63,3 +63,7 @@ validate_var_relationship(dt, "person_id", "department")
 validate_var_relationship(dt, "department", "country")
 
 }
+\seealso{
+\code{\link[=validate_primary_keys]{validate_primary_keys()}} for key uniqueness validation,
+\code{\link[=validate_join]{validate_join()}} for join relationship analysis
+}

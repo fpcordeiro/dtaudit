@@ -4,7 +4,13 @@
 \alias{check_date_coverage}
 \title{Check Date Coverage}
 \usage{
-check_date_coverage(date_var, start_date, end_date, by = "month")
+check_date_coverage(
+  date_var,
+  start_date,
+  end_date,
+  by = "month",
+  quiet = FALSE
+)
 }
 \arguments{
 \item{date_var}{A vector of dates to check.}
@@ -17,10 +23,13 @@ check_date_coverage(date_var, start_date, end_date, by = "month")
 
 \item{by}{Character. Period granularity: one of \code{"day"}, \code{"week"},
 \code{"month"}, \code{"quarter"}, or \code{"year"}. Defaults to \code{"month"}.}
+
+\item{quiet}{Logical. If \code{TRUE}, suppresses printed output. Defaults to
+\code{FALSE}.}
 }
 \value{
 An \link[data.table:IDateTime]{IDate} vector of missing periods, returned
-invisibly. Also prints missing periods as a side effect.
+invisibly.
 }
 \description{
 Verifies whether a date vector contains data for all periods within a
@@ -32,4 +41,8 @@ dates <- as.IDate(c("2023-01-15", "2023-02-20", "2023-04-10"))
 check_date_coverage(dates, "2023-01-01", "2023-04-30")
 check_date_coverage(dates, "2023-01-01", "2023-04-30", by = "quarter")
 
+}
+\seealso{
+\code{\link[=check_months_coverage]{check_months_coverage()}} for a convenience wrapper with
+\code{by = "month"}
 }

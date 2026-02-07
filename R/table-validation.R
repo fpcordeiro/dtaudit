@@ -22,12 +22,14 @@
 #' A warning is issued if any key column is numeric (double), as floating-point
 #' values can cause unexpected behavior in exact matching operations.
 #'
+#' @seealso [validate_join()] for join relationship analysis,
+#'   [validate_var_relationship()] for variable relationship analysis
+#'
 #' @examples
 #' library(data.table)
 #' dt <- data.table(
 #'   id = c(1L, 2L, 3L, 4L),
 #'   group = c("A", "A", "B", "B"),
-#'
 #'   value = c(10, 20, 30, 40)
 #' )
 #'
@@ -174,6 +176,9 @@ print.validate_pk <- function(x, ...) {
 #'   \item \strong{many-to-many}: Both variables have values that map to multiple
 #'     values of the other.
 #' }
+#'
+#' @seealso [validate_primary_keys()] for key uniqueness validation,
+#'   [validate_join()] for join relationship analysis
 #'
 #' @examples
 #' library(data.table)

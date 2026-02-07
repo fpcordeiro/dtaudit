@@ -1,13 +1,13 @@
 Package: dtaudit
-Title: data.table Audit and Diagnostic Tools
+Title: Audit and Diagnostic Tools for 'data.table' Workflows
 Version: 0.1.0
 Authors@R:
     person("Fernando", "Cordeiro", , "fernandolpcordeiro@gmail.com", role = c("aut", "cre"))
-Description: Tools for auditing data analysis workflows, particularly those
-    using data.table. Provides functions to validate join operations, compare
-    data.tables, filter with diagnostic output, summarize data quality, clean
-    variable and firm names, and export results to Excel. Designed to help
-    analysts understand and document data transformations.
+Description: Diagnostic tools for auditing data analysis workflows built on
+    'data.table'. Provides functions to validate join operations, compare
+    data.tables, filter with diagnostic output, summarize data quality, check
+    primary keys and variable relationships, and diagnose string columns.
+    Designed to help analysts understand and document data transformations.
 License: LGPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -15,10 +15,12 @@ RoxygenNote: 7.3.3
 Imports:
     data.table,
     stringi
+URL: https://github.com/fpcordeiro/dtaudit
+BugReports: https://github.com/fpcordeiro/dtaudit/issues
 Suggests:
-    fixest,
-    modelsummary,
-    openxlsx,
+    knitr,
     pbapply,
+    rmarkdown,
     testthat (>= 3.0.0)
+VignetteBuilder: knitr
 Config/testthat/edition: 3
