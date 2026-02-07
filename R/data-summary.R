@@ -332,7 +332,7 @@ diagnose_nas <- function(dt) {
 #' Print Method for diagnose_na Objects
 #'
 #' @param x A `diagnose_na` object from [diagnose_nas()].
-#' @param ... Additional arguments (unused).
+#' @param ... Additional arguments (ignored).
 #'
 #' @returns The `diagnose_na` object, invisibly.
 #'

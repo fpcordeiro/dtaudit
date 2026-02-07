@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{A \code{compare_dt} object from \code{\link[=compare_datatables]{compare_datatables()}}.}
 
-\item{...}{Additional arguments (unused).}
+\item{...}{Additional arguments (ignored).}
 }
 \value{
 The \code{compare_dt} object, invisibly.

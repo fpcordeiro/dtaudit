@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{A \code{diagnose_na} object from \code{\link[=diagnose_nas]{diagnose_nas()}}.}
 
-\item{...}{Additional arguments (unused).}
+\item{...}{Additional arguments (ignored).}
 }
 \value{
 The \code{diagnose_na} object, invisibly.

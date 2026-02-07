@@ -212,7 +212,7 @@ compare_datatables <- function(dt1, dt2, key_cols = NULL) {
 #' Print Method for compare_dt Objects
 #'
 #' @param x A `compare_dt` object from [compare_datatables()].
-#' @param ... Additional arguments (unused).
+#' @param ... Additional arguments (ignored).
 #'
 #' @returns The `compare_dt` object, invisibly.
 #'
