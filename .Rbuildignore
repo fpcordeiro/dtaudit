@@ -9,3 +9,5 @@
 ^Meta$
 ^cran-comments\.md$
 ^\.gitignore$
+^revdep$
+^CRAN-SUBMISSION$
