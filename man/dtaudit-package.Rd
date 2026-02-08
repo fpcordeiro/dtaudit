@@ -17,7 +17,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Fernando Cordeiro \email{fernandolpcordeiro@gmail.com}
+\strong{Maintainer}: Fernando Cordeiro \email{fernandolpcordeiro@gmail.com} [copyright holder]
 
 }
 \keyword{internal}
