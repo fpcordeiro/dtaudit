@@ -13,10 +13,13 @@ Audit and Diagnostic Tools for `data.table` Workflows
 ## Installation
 
 ```r
-# Using `remotes`
+# Install CRAN version using
+install.packages("dtaudit")
+
+# Install development version using `remotes`
 remotes::install_github("fpcordeiro/dtaudit")
 
-# Or using `pak`
+# Install development version using using `pak`
 pak::pkg_install("fpcordeiro/dtaudit")
 ```
 
