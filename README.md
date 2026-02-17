@@ -1,6 +1,10 @@
 # dtaudit
 
 <!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/dtaudit)](https://CRAN.R-project.org/package=dtaudit)
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/dtaudit)](https://cran.r-project.org/package=dtaudit)
+[![R-CMD-check](https://github.com/fpcordeiro/dtaudit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/fpcordeiro/dtaudit/actions/workflows/R-CMD-check.yaml)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
